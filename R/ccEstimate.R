@@ -70,35 +70,35 @@ run_random_spots = function(img, random_image_size = 50, n_random_images = 1000)
     return(confluence)
 }
 
-organize_files = function(infolder = "", run_example = FALSE)
+organize_files = function(infolder            = "", 
+                          run_example         = FALSE,
+                          reduced_size        =    0.8  ,
+                          sharpen_filter_size =   15    ,
+                          contrast            =    2    ,
+                          brush_size          =    5    , 
+                          shape               = "disc"  ,
+                          random_image_size   =   50    , 
+                          n_random_images     = 100)
 {
     if(run_example == TRUE)
     {
-        infiles = readLines(system.file("extdata", "example_files.txt" , package = "ccEstimate"))
+        x = data.table::fread(system.file("extdata", "example_files.txt" , package = "ccEstimate"), sep = "\t", header = TRUE, data.table = FALSE)
     }else
     {
         infiles = list.files(infolder)   
-    }
-     
-    x       = data.frame(file          = infiles,
-                         udid          =                             unlist(lapply(infiles, function(x){paste(unlist(strsplit(x, "_"))[1:2], collapse = "_")})),
-                         sample_id     =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[3]]                 })),
-                         clone         =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[4]]                 })),
-                         passage       =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[5]]                 })),
-                         day           =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[7]]                 })),
-                         flask         = as.numeric(gsub("FL"  , "", unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[8]]                 })))),
-                         view          = as.numeric(gsub("VIEW", "", unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[9]]                 }))))
-                        )
-
-    if(run_example == TRUE)
-    {
-        x$date_acquired =            unlist(lapply(x$file, function(infile){file.info (system.file("extdata", infile, package = "ccEstimate"))$mtime}))
-        x$confluence    = as.numeric(unlist(lapply(x$file, function(infile){ccEstimate(system.file("extdata", infile, package = "ccEstimate"))      })))
-    }else
-    {
+		x       = data.frame(file          = infiles,
+							 udid          =                             unlist(lapply(infiles, function(x){paste(unlist(strsplit(x, "_"))[1:2], collapse = "_")})),
+							 sample_id     =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[3]]                 })),
+							 clone         =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[4]]                 })),
+							 passage       =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[5]]                 })),
+							 day           =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[7]]                 })),
+							 flask         = as.numeric(gsub("FL"  , "", unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[8]]                 })))),
+							 view          = as.numeric(gsub("VIEW", "", unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[9]]                 }))))
+							)
+							
         x$path          = paste(infolder, x$file, sep = "/")
         x$date_acquired =            unlist(lapply(x$path, function(infile){file.info (infile)$mtime}))
-        x$confluence    = as.numeric(unlist(lapply(x$path, function(infile){ccEstimate(infile)      })))
+        x$confluence    = as.numeric(unlist(lapply(x$path, function(infile){ccEstimate(infile, reduced_size, sharpen_filter_size, contrast, brush_size, shape, random_image_size, n_random_images)})))
     }
     
     return(x)
@@ -210,14 +210,32 @@ ccEstimate = function(infile,
 #' @param run_example Run example data. Default = FALSE.
 #' @param confluence_target Confluence at which differentiation should start. Values between 0 and 1. Default = 0.8.
 #' @param plot_confluence Plot confluence values at each time point. Default = TRUE
+#' @param reduced_size Use a sub-image with dimensions reduced_size * width: reduced_size * height. Default = 0.8.
+#' @param sharpen_filter_size Size of the sharpen filter. Creates a squared matrix with size sharpen_filter_size: values are -1 on diagonals and center = sharpen_filter_size * 2 -2. Default = 15.
+#' @param contrast Contrast value. Default = 2.
+#' @param brush_size Brush size. Default = 5.
+#' @param shape Brush shape. Can be box, disc, diamond, Gaussian or line. Default = "disc".
+#' @param random_image_size Size of random sub-images to be generated. Default = 50.
+#' @param n_random_images Number of random images to be generated. Default = 100.
 #' @return A data frame with the confluency estimation for each sample and flask analyzed
 #' @export
 #' @examples
 #' run_confluency_estimation(run_example = TRUE)
 
-run_confluency_estimation = function(infolder = "", run_example = FALSE, confluence_target = 0.8, plot_confluence = TRUE)
+run_confluency_estimation = function(infolder            = "", 
+                                     run_example         = FALSE, 
+									 confluence_target   = 0.8, 
+									 plot_confluence     = TRUE,
+									 reduced_size        =    0.8  ,
+                                     sharpen_filter_size =   15    ,
+                                     contrast            =    2    ,
+                                     brush_size          =    5    , 
+                                     shape               = "disc"  ,
+                                     random_image_size   =   50    , 
+                                     n_random_images     = 100
+                                    )
 {
-    indata = organize_files(infolder, run_example)
+    indata = organize_files(infolder, run_example, reduced_size, sharpen_filter_size, contrast, brush_size, shape, random_image_size, n_random_images)
     out    = estimate_confluence(indata, confluence_target, plot_confluence)
     
     return(out)
