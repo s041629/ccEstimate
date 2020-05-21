@@ -8,6 +8,8 @@ Authors@R:
            email = "madantonio@ucsd.edu",
            comment = c(ORCID = "0000-0001-5844-6433"))
 Description: Calculate cell confluency for monolayer iPSCs.
+Author: Matteo D'Antonio [aut]
+Maintainer: Matteo D'Antonio <madantonio@ucsd.edu>
 License: `use_mit_license()`
 Encoding: UTF-8
 LazyData: true
