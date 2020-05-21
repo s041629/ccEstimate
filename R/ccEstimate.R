@@ -45,7 +45,7 @@ to_binary = function(img)
 dilate_image = function(img, brush_size = 5, shape = "disc")
 {
     kern       = EBImage::makeBrush(brush_size, shape = shape)
-    img_dilate = dilate(img, kern)
+    img_dilate = EBImage::dilate(img, kern)
     
     return(img_dilate)
 }
