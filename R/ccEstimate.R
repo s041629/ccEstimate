@@ -82,7 +82,7 @@ organize_files = function(infolder            = "",
 {
     if(run_example == TRUE)
     {
-        x = data.table::fread(system.file("extdata", "example_files.txt" , package = "ccEstimate"), sep = "\t", header = TRUE, data.table = FALSE)
+        x = data.table::fread(system.file("extdata", "example.txt" , package = "ccEstimate"), sep = "\t", header = TRUE, data.table = FALSE)
     }else
     {
         infiles = list.files(infolder)   
