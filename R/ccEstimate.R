@@ -81,7 +81,6 @@ organize_files = function(infolder = "", run_example = FALSE)
     }
      
     x       = data.frame(file          = infiles,
-                         path          = paste(infolder, infiles, sep = "/"),
                          udid          =                             unlist(lapply(infiles, function(x){paste(unlist(strsplit(x, "_"))[1:2], collapse = "_")})),
                          sample_id     =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[3]]                 })),
                          clone         =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[4]]                 })),
@@ -93,10 +92,11 @@ organize_files = function(infolder = "", run_example = FALSE)
 
     if(run_example == TRUE)
     {
-        x$date_acquired =            unlist(lapply(x$path, function(infile){file.info (system.file("extdata", "example_files.txt" , package = "ccEstimate"))$mtime}))
-        x$confluence    = as.numeric(unlist(lapply(x$path, function(infile){ccEstimate(system.file("extdata", "example_files.txt" , package = "ccEstimate"))      })))
+        x$date_acquired =            unlist(lapply(x$file, function(infile){file.info (system.file("extdata", infile, package = "ccEstimate"))$mtime}))
+        x$confluence    = as.numeric(unlist(lapply(x$file, function(infile){ccEstimate(system.file("extdata", infile, package = "ccEstimate"))      })))
     }else
     {
+        x$path          = paste(infolder, infiles, sep = "/"),
         x$date_acquired =            unlist(lapply(x$path, function(infile){file.info (infile)$mtime}))
         x$confluence    = as.numeric(unlist(lapply(x$path, function(infile){ccEstimate(infile)      })))
     }
