@@ -48,3 +48,10 @@ Display input files
 EBImage::display(EBImage::readImage(example_low_confluency ))
 EBImage::display(EBImage::readImage(example_high_confluency))
 ```
+
+Estimate confluency
+
+```{r}
+ccEstimate(example_low_confluency)
+ccEstimate(example_high_confluency)
+```

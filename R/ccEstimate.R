@@ -1,7 +1,6 @@
 img_to_monochrome = function(img, reduced_size = 1)
 {
     img            = (img[,,1] + img[,,2] + img[,,3]) / 3
-    colorMode(img) = Grayscale
     img_reduced    = img[c(floor(nrow(img) * (1 - reduced_size)/2): ceiling(nrow(img) * (1 - (1 - reduced_size)/2))),
                          c(floor(ncol(img) * (1 - reduced_size)/2): ceiling(ncol(img) * (1 - (1 - reduced_size)/2)))
                         ]
@@ -16,7 +15,6 @@ sharpen_edges = function(img, sharpen_filter_size = 15)
     matrix_to_sharpen[trunc(sharpen_filter_size/2 + 1), trunc(sharpen_filter_size/2 + 1)] = -sum(matrix_to_sharpen) - 1
     
     img_sharpened            = EBImage::filter2(img, matrix_to_sharpen)
-    colorMode(img_sharpened) = Grayscale
     
     if(length(img_sharpened[img_sharpened > 1]) > 0){img_sharpened[img_sharpened > 1] = 1}
     if(length(img_sharpened[img_sharpened < 0]) > 0){img_sharpened[img_sharpened < 0] = 0}
