@@ -15,7 +15,7 @@ sharpen_edges = function(img, sharpen_filter_size = 15)
     for(ii in 1:sharpen_filter_size){matrix_to_sharpen[ii, c(ii, sharpen_filter_size - ii + 1)] = -1}
     matrix_to_sharpen[trunc(sharpen_filter_size/2 + 1), trunc(sharpen_filter_size/2 + 1)] = -sum(matrix_to_sharpen) - 1
     
-    img_sharpened            = filter2(img, matrix_to_sharpen)
+    img_sharpened            = EBImage::filter2(img, matrix_to_sharpen)
     colorMode(img_sharpened) = Grayscale
     
     if(length(img_sharpened[img_sharpened > 1]) > 0){img_sharpened[img_sharpened > 1] = 1}
@@ -46,7 +46,7 @@ to_binary = function(img)
 
 dilate_image = function(img, brush_size = 5, shape = "disc")
 {
-    kern       = makeBrush(brush_size, shape = shape)
+    kern       = EBImage::makeBrush(brush_size, shape = shape)
     img_dilate = dilate(img, kern)
     
     return(img_dilate)
@@ -100,7 +100,7 @@ ccEstimate = function(infile,
                       n_random_images     = 100
                      )
 {
-    img           = readImage(infile)
+    img           = EBImage::readImage(infile)
     img_single    = img_to_monochrome(img          , reduced_size       )
     img_sharpened = sharpen_edges    (img_single   , sharpen_filter_size)
     img_enhanced  = enhance_contrast (img_sharpened, contrast           )
