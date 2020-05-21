@@ -1,0 +1,21 @@
+Package: ccEstimate
+Title: Calculate cell confluency for monolayer iPSCs 
+Version: 0.0.0.9000
+Authors@R: 
+    person(given = "Matteo",
+           family = "D'Antonio",
+           role = "cre",
+           email = "madantonio@ucsd.edu",
+           comment = c(ORCID = "0000-0001-5844-6433"))
+Description: Calculate cell confluency for monolayer iPSCs.
+License: `use_mit_license()`
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.0
+Imports:
+	EBImage
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
