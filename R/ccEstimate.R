@@ -72,9 +72,14 @@ run_random_spots = function(img, random_image_size = 50, n_random_images = 1000)
 
 organize_files = function(infolder = "", run_example = FALSE)
 {
-    #if(run_example == TRUE)
-    
-    infiles = list.files(infolder)    
+    if(run_example == TRUE)
+    {
+        infiles = readLines(system.file("extdata", "example_files.txt" , package = "ccEstimate"))
+    }else
+    {
+        infiles = list.files(infolder)   
+    }
+     
     x       = data.frame(file          = infiles,
                          path          = paste(infolder, infiles, sep = "/"),
                          udid          =                             unlist(lapply(infiles, function(x){paste(unlist(strsplit(x, "_"))[1:2], collapse = "_")})),
@@ -86,8 +91,15 @@ organize_files = function(infolder = "", run_example = FALSE)
                          view          = as.numeric(gsub("VIEW", "", unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[9]]                 }))))
                         )
 
-    x$date_acquired =            unlist(lapply(x$path, function(infile){file.info (infile)$mtime}))
-    x$confluence    = as.numeric(unlist(lapply(x$path, function(infile){ccEstimate(infile)      })))
+    if(run_example == TRUE)
+    {
+        x$date_acquired =            unlist(lapply(x$path, function(infile){file.info (system.file("extdata", "example_files.txt" , package = "ccEstimate"))$mtime}))
+        x$confluence    = as.numeric(unlist(lapply(x$path, function(infile){ccEstimate(system.file("extdata", "example_files.txt" , package = "ccEstimate"))      })))
+    }else
+    {
+        x$date_acquired =            unlist(lapply(x$path, function(infile){file.info (infile)$mtime}))
+        x$confluence    = as.numeric(unlist(lapply(x$path, function(infile){ccEstimate(infile)      })))
+    }
     
     return(x)
 }
