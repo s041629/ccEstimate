@@ -96,7 +96,7 @@ organize_files = function(infolder = "", run_example = FALSE)
         x$confluence    = as.numeric(unlist(lapply(x$file, function(infile){ccEstimate(system.file("extdata", infile, package = "ccEstimate"))      })))
     }else
     {
-        x$path          = paste(infolder, infiles, sep = "/"),
+        x$path          = paste(infolder, infiles, sep = "/")
         x$date_acquired =            unlist(lapply(x$path, function(infile){file.info (infile)$mtime}))
         x$confluence    = as.numeric(unlist(lapply(x$path, function(infile){ccEstimate(infile)      })))
     }
