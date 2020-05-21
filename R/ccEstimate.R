@@ -237,6 +237,7 @@ run_confluency_estimation = function(infolder            = "",
                                     )
 {
     indata = organize_files(infolder, run_example, reduced_size, sharpen_filter_size, contrast, brush_size, shape, random_image_size, n_random_images)
+	return(indata)
     out    = estimate_confluence(indata, confluence_target, plot_confluence)
     
     return(out)
