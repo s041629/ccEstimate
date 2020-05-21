@@ -70,6 +70,89 @@ run_random_spots = function(img, random_image_size = 50, n_random_images = 1000)
     return(confluence)
 }
 
+organize_files = function(infolder = "", run_example = FALSE)
+{
+    #if(run_example == TRUE)
+    
+    infiles = list.files(infolder)    
+    x       = data.frame(file          = infiles,
+                         path          = paste(infolder, infiles, sep = "/"),
+                         udid          =                             unlist(lapply(infiles, function(x){paste(unlist(strsplit(x, "_"))[1:2], collapse = "_")})),
+                         sample_id     =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[3]]                 })),
+                         clone         =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[4]]                 })),
+                         passage       =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[5]]                 })),
+                         day           =                             unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[7]]                 })),
+                         flask         = as.numeric(gsub("FL"  , "", unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[8]]                 })))),
+                         view          = as.numeric(gsub("VIEW", "", unlist(lapply(infiles, function(x){      unlist(strsplit(x, "_"))[[9]]                 }))))
+                        )
+
+    x$date_acquired =            unlist(lapply(x$path, function(infile){file.info (infile)$mtime}))
+    x$confluence    = as.numeric(unlist(lapply(x$path, function(infile){ccEstimate(infile)      })))
+    
+    return(x)
+}
+
+estimate_confluence_by_pos = function(ii, totest, indata, confluence_target = 0.8)
+{
+    id        = totest[ii, "id"   ]
+    flask     = totest[ii, "flask"]
+    view      = totest[ii, "view" ]
+    this      = indata[indata$id == id & indata$flask == flask & indata$view == view,]
+    mod       = lm(confluence ~ date_acquired, data = this)
+    intercept = mod$coefficients[[1]]
+    slope     = mod$coefficients[[2]]
+    out       = totest[ii,]
+    out$pred  = (confluence_target - intercept) / slope
+    
+    return(out)
+}
+
+plot_confluence_prediction = function(ii, out_fit, indata, confluence_target = 0.8)
+{
+    id       = out_fit[ii, "id"   ]
+    flask    = out_fit[ii, "flask"]
+    pred     = out_fit[ii, "pred" ]
+    indata   = indata[indata$id == id & indata$flask == flask,]
+    view2col = data.frame(view = sort(unique(indata$view)), color = RColorBrewer::brewer.pal(length(unique(indata$view)), "Spectral"))
+    
+    plot(as.POSIXct(0, origin = "1970-01-01 0:00:00", tz = ""),1, type = "n", xlim = range(c(indata$date_acquired, pred)), ylim = c(0,1), xlab = "Days", ylab = "Confluence")
+    
+    mtext(text = paste(id, ", Flask ", flask, sep = ""), side = 3, line = 1.5, font = 2)
+    mtext(text = paste("Confluence ", confluence_target * 100, "% on ", as.POSIXct(pred, origin = "1970-01-01 0:00:00", tz = ""), sep = ""), side = 3, line = 0)
+    
+    abline(h = confluence_target, col = "#FF0000", lty = "dashed")
+    
+    axis.POSIXct(1, at = seq(min(indata$date), max(indata$date) + 86400, by = "day"), format = "%D")
+    legend("topleft", legend = view2col$view, fill = view2col$color, title = "Views")
+    
+    indata = merge(indata, view2col)
+    points(indata$date_acquired, indata$confluence, pch = 21, bg = indata$color, cex = 2)
+    
+    abline(v = pred, col = "#ff0000", lty = "dashed", lwd = 2)
+}
+
+estimate_confluence = function(indata, confluence_target = 0.8, plot_confluence = TRUE)
+{
+    indata$id         = paste(indata$udid, indata$sample_id, indata$clone, indata$passage, sep = "_")
+    indata$id_flask   = paste(indata$id, indata$flask, sep = "_")
+    totest            = unique(indata[,c("id", "flask", "view")])
+    fit               = as.data.frame(data.table::rbindlist(lapply(1:nrow(totest), function(ii){estimate_confluence_by_pos(ii, totest, indata, confluence_target)})), stringsAsFactors = FALSE)
+    out_fit           = aggregate(pred ~ id + flask, data = fit, FUN = median)
+    out_fit$pred_date = as.POSIXct(out_fit$pred         , origin = "1970-01-01 0:00:00", tz = "")
+    fit    $pred_date = as.POSIXct(fit    $pred         , origin = "1970-01-01 0:00:00", tz = "")
+    indata $date      = as.POSIXct(indata $date_acquired, origin = "1970-01-01 0:00:00", tz = "")
+    
+    if(plot_confluence == TRUE)
+    {
+        invisible(lapply(1:nrow(out_fit), function(ii){plot_confluence_prediction(ii, out_fit, indata, confluence_target)}))
+    }
+    
+    out           = out_fit[,c("id", "flask", "pred_date")]
+    colnames(out) = c("ID", "Flask", "Confluence target date")
+    
+    return(out)
+}
+
 #' Calculate cell confluency.
 #' 
 #' @param infile Input file (JPG, PNG or TIFF).
@@ -108,3 +191,23 @@ ccEstimate = function(infile,
     
     return(confluence)
 }
+
+#' Estimate when confluency will reach a predetermined threshold.
+#' 
+#' @param infolder Input folder where all the images to analyze are stored. Deafult = "".
+#' @param run_example Run example data. Default = FALSE.
+#' @param confluence_target Confluence at which differentiation should start. Values between 0 and 1. Default = 0.8.
+#' @param plot_confluence Plot confluence values at each time point. Default = TRUE
+#' @return A data frame with the confluency estimation for each sample and flask analyzed
+#' @export
+#' @examples
+#' run_confluency_estimation(run_example = TRUE)
+
+run_confluency_estimation = function(infolder = "", run_example = FALSE, confluence_target = 0.8, plot_confluence = TRUE)
+{
+    indata = organize_files(infolder, run_example)
+    out    = estimate_confluence(indata, confluence_target, plot_confluence)
+    
+    return(out)
+}
+
