@@ -147,6 +147,7 @@ estimate_confluence = function(indata, confluence_target = 0.8, plot_confluence 
 {
     indata$id         = paste(indata$udid, indata$sample_id, indata$clone, indata$passage, sep = "_")
     indata$id_flask   = paste(indata$id, indata$flask, sep = "_")
+	return(indata)
     totest            = unique(indata[,c("id", "flask", "view")])
     fit               = as.data.frame(data.table::rbindlist(lapply(1:nrow(totest), function(ii){estimate_confluence_by_pos(ii, totest, indata, confluence_target)})), stringsAsFactors = FALSE)
     out_fit           = aggregate(pred ~ id + flask, data = fit, FUN = median)
