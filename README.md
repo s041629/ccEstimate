@@ -66,18 +66,21 @@ ccEstimate(example_low_confluency, n_random_images = 200)
 ## Example data
 Run example (pre-made list of samples):
 
-```{r}
+```
 run_confluency_estimation(run_example = TRUE)
 ```
 
-# Predict when cells will be ready to start differentiation
+Explore example dataset:
 
-## Example data
-Run example (pre-made list of samples):
-
-```{r}
-run_confluency_estimation(run_example = TRUE)
 ```
+example_dataset = data.table::fread(system.file("extdata", "example.txt" , package = "ccEstimate"), sep = "\t", header = TRUE, data.table = FALSE)
+```
+
+Plot one of the example files:
+```
+EBImage::display(EBImage::readImage(system.file("extdata", example_dataset[1, "file"], package = "ccEstimate")))
+```
+
 
 ## User-defined data
 
