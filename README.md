@@ -61,6 +61,44 @@ ccEstimate(example_low_confluency, n_random_images = 200)
 ```
 
 
+# Predict when cells will be ready to start differentiation
+
+## Example data
+Run example (pre-made list of samples):
+
+```{r}
+run_confluency_estimation(run_example = TRUE)
+```
+
+# Predict when cells will be ready to start differentiation
+
+## Example data
+Run example (pre-made list of samples):
+
+```{r}
+run_confluency_estimation(run_example = TRUE)
+```
+
+## User-defined data
+
+Take images of the cells starting from 24h after plating monolayer. Provide the following nomenclature to the file: 
+* UDID_NNN_SUBJECT_CLONE_PASSAGE_MONO_DAY_FLASK_VIEW_DATE_
+* Example: UDID_001_iPSCORE-2-3_C5_P22_MONO_D1_FL1_VIEW1_20150723_
+* Where:
+* UDID - Unique Differentiation Identifier
+* NNN – UDID number
+* SUBJECT – Subject ID from whom iPSC was derived (iPSC line name)
+* CLONE – iPSC clone number
+* PASSAGE – iPSC passage number
+* MONO – indicates Monolayer stage
+* DAY – number of the day of monolayer stage
+* FLASK – Indicates number of flask when performing differentiation in multiple flasks
+* VIEW – location in the flask (Please refer to the Figure 2A for details)
+* DATE – Date of the imaging in format YYYYMMDD
+
+Save all image files to the same folder (`input_folder`), then run `run_confluency_estimation(input_folder)`:
+
+
 ## Citations
 
 * D'Antonio-Chronowska A, Donovan MKR, Young Greenwald WW, Nguyen JP, Fujita K, Hashem S, Matsui H, Soncin F, Parast M, Ward MC, Coulet F, Smith EN, Adler E, D'Antonio M, Frazer KA. 
