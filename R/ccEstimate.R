@@ -149,7 +149,6 @@ estimate_confluence = function(indata, confluence_target = 0.8, plot_confluence 
     indata$id_flask   = paste(indata$id, indata$flask, sep = "_")
     totest            = unique(indata[,c("id", "flask", "view")])
     fit               = as.data.frame(data.table::rbindlist(lapply(1:nrow(totest), function(ii){estimate_confluence_by_pos(ii, totest, indata, confluence_target)})), stringsAsFactors = FALSE)
-	return(fit)
     out_fit           = aggregate(pred ~ id + flask, data = fit, FUN = median)
     out_fit$pred_date = as.POSIXct(out_fit$pred         , origin = "1970-01-01 0:00:00", tz = "")
     fit    $pred_date = as.POSIXct(fit    $pred         , origin = "1970-01-01 0:00:00", tz = "")
